@@ -1,16 +1,15 @@
 package main
 
 import (
-	"chat_ik/internal/config"
-	sqlite "chat_ik/internal/repository/sqlite"
-	"chat_ik/internal/service"
-	"fmt"
+	"chat_ik/internal/app"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
-	cfg := config.MustInit()
-	repo := sqlite.NewSqlLiteRepository(cfg)
-	serv := service.NewService(repo)
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP) //SIGTERM - kill <pid>, SIGHUP - close terminal
 
-	fmt.Println(serv)
+	app.Run(done)
 }
