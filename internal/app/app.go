@@ -5,6 +5,7 @@ import (
 	"chat_ik/internal/controller"
 	sqlite "chat_ik/internal/repository/sqlite"
 	"chat_ik/internal/service"
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -29,6 +30,10 @@ func Run(done chan os.Signal) {
 
 	go server.ListenAndServe()
 
+	context := context.TODO()
+
 	<-done
 	fmt.Println("SERVER was interrupted")
+
+	server.Shutdown(context)
 }
