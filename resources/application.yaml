@@ -1,7 +1,4 @@
 datasource:
   sqllite:
     url: "./resources/db/messager.db"
-    # password: "root"
-    # username: "root"
-    database: "messager"
     type: "sqlite3"

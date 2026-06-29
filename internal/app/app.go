@@ -15,13 +15,17 @@ import (
 
 func Run(done chan os.Signal) {
 	cfg := config.MustInit()
-	repo := sqlite.NewSqlLiteRepository(cfg)
-	serv := service.NewService(repo)
+	repoMessage := sqlite.NewSqlLiteMessageRepository(cfg)
+	repoUser := sqlite.NewSqlLiteUserRepository(cfg)
+	servMessage := service.NewMessageService(repoMessage)
+	servUser := service.NewUserService(repoUser)
 
-	fmt.Println(serv)
+	fmt.Print(servMessage)
+
+	userController := controller.NewUserController(servUser)
 
 	r := gin.Default()
-	controller.SetupRoutes(r)
+	controller.SetupRoutes(r, userController)
 
 	server := &http.Server{
 		Addr:    ":8080",

@@ -14,12 +14,12 @@ type Repository struct {
 	config *config.Config
 }
 
-func NewSqlLiteRepository(config config.Config) *Repository {
+func NewSqlLiteMessageRepository(config config.Config) *Repository {
 	return &Repository{config: &config}
 }
 
 func (r *Repository) initDB() (*sql.DB, error) {
-	db, err := sql.Open(r.config.DataSource.Sql.Type, r.config.DataSource.Sql.Database)
+	db, err := sql.Open(r.config.DataSource.Sql.Type, r.config.DataSource.Sql.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed open db: %w", err)
 	}

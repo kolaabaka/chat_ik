@@ -1,7 +1,8 @@
 package controller
 
 import (
-	"fmt"
+	"chat_ik/internal/repository/entity"
+	"chat_ik/internal/service"
 	"io"
 	"net/http"
 	"strings"
@@ -9,7 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func registrationHandler(c *gin.Context) {
+type UserController struct {
+	service service.UserService
+}
+
+func NewUserController(service *service.UserService) *UserController {
+	return &UserController{service: *service}
+}
+
+func (uc *UserController) registrationHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 
 	defer c.Request.Body.Close()
@@ -20,13 +29,17 @@ func registrationHandler(c *gin.Context) {
 
 	userData := strings.Split(string(body), "#")
 
-	//save user
-	fmt.Println(userData)
+	userToSave := entity.User{
+		Nickname: userData[0],
+		Hash:     userData[1],
+	}
+
+	uc.service.SaveUser(userToSave)
 
 	c.Status(http.StatusOK)
 }
 
-func loginHandler(c *gin.Context) {
+func (uc *UserController) loginHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 
 	defer c.Request.Body.Close()
@@ -37,9 +50,18 @@ func loginHandler(c *gin.Context) {
 
 	credentialString := strings.Split(string(body), "#")
 
-	//check cred
+	loginUser := entity.User{
+		Nickname: credentialString[0],
+		Hash:     credentialString[1],
+	}
 
-	//return cookie
+	cookie := uc.service.LoginUser(loginUser)
 
-	c.String(http.StatusOK, credentialString[0])
+	if cookie == "" {
+		c.String(http.StatusForbidden, cookie)
+
+	} else {
+		c.String(http.StatusOK, cookie)
+	}
+
 }
