@@ -10,15 +10,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Repository struct {
+type MessageRepository struct {
 	config *config.Config
 }
 
-func NewSqlLiteMessageRepository(config config.Config) *Repository {
-	return &Repository{config: &config}
+func NewSqlLiteMessageRepository(config config.Config) *MessageRepository {
+	return &MessageRepository{config: &config}
 }
 
-func (r *Repository) initDB() (*sql.DB, error) {
+func (r *MessageRepository) initDB() (*sql.DB, error) {
 	db, err := sql.Open(r.config.DataSource.Sql.Type, r.config.DataSource.Sql.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed open db: %w", err)
@@ -36,7 +36,7 @@ func (r *Repository) initDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func (r *Repository) GetAllOppenents(author string) []string {
+func (r *MessageRepository) GetAllOppenents(author string) []string {
 	con, err := r.initDB()
 	if err != nil {
 		panic(err)
@@ -46,7 +46,7 @@ func (r *Repository) GetAllOppenents(author string) []string {
 	return []string{"mock"}
 }
 
-func (r *Repository) GetDialog(author string, opponent string) []entity.Message {
+func (r *MessageRepository) GetDialog(author string, opponent string) []entity.Message {
 	con, err := r.initDB()
 	if err != nil {
 		panic(err)
@@ -55,7 +55,7 @@ func (r *Repository) GetDialog(author string, opponent string) []entity.Message 
 	return []entity.Message{}
 }
 
-func (r *Repository) AddMessage(entity.Message) (bool, error) {
+func (r *MessageRepository) AddMessage(entity.Message) (bool, error) {
 	con, err := r.initDB()
 	if err != nil {
 		panic(err)

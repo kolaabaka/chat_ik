@@ -14,13 +14,18 @@ import (
 )
 
 func Run(done chan os.Signal) {
+	//todo: make syncronised initDb method
 	cfg := config.MustInit()
+
 	repoMessage := sqlite.NewSqlLiteMessageRepository(cfg)
 	repoUser := sqlite.NewSqlLiteUserRepository(cfg)
+	repoSession := sqlite.NewSqlLiteSessionRepository(cfg)
+
 	servMessage := service.NewMessageService(repoMessage)
 	servUser := service.NewUserService(repoUser)
 
 	fmt.Print(servMessage)
+	fmt.Print(repoSession)
 
 	userController := controller.NewUserController(servUser)
 
