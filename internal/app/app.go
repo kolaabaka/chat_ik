@@ -18,8 +18,8 @@ func Run(done chan os.Signal) {
 	cfg := config.MustInit()
 
 	repoMessage := sqlite.NewSqlLiteMessageRepository(cfg)
-	repoUser := sqlite.NewSqlLiteUserRepository(cfg)
 	repoSession := sqlite.NewSqlLiteSessionRepository(cfg)
+	repoUser := sqlite.NewSqlLiteUserRepository(cfg, repoSession)
 
 	servMessage := service.NewMessageService(repoMessage)
 	servUser := service.NewUserService(repoUser)

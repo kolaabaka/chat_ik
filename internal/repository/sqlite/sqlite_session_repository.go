@@ -60,7 +60,6 @@ func (rs *SessionRepository) CheckSession(hash string) entity.Session {
 	if err != nil || !row.Next() {
 		return session
 	}
-
 	defer row.Close()
 
 	row.Scan(&session.Id)

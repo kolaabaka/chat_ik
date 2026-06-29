@@ -2,6 +2,7 @@ package repository
 
 import (
 	"chat_ik/internal/config"
+	"chat_ik/internal/repository"
 	"chat_ik/internal/repository/entity"
 	"crypto/rand"
 	"crypto/sha256"
@@ -11,7 +12,15 @@ import (
 )
 
 type UserRepository struct {
-	config *config.Config
+	sessionRepo repository.SessionRepository
+	config      *config.Config
+}
+
+func NewSqlLiteUserRepository(config config.Config, sessionRepo repository.SessionRepository) *UserRepository {
+	return &UserRepository{
+		config:      &config,
+		sessionRepo: sessionRepo,
+	}
 }
 
 func (r *UserRepository) initDB() (*sql.DB, error) {
@@ -30,10 +39,6 @@ func (r *UserRepository) initDB() (*sql.DB, error) {
 	}
 
 	return db, nil
-}
-
-func NewSqlLiteUserRepository(config config.Config) *UserRepository {
-	return &UserRepository{config: &config}
 }
 
 func (r *UserRepository) SaveUser(user entity.User) {
@@ -57,7 +62,6 @@ func (r *UserRepository) LoginUser(user entity.User) string {
 	if err != nil {
 		panic(err)
 	}
-	defer con.Close()
 
 	hash := sha256.Sum256([]byte(user.Hash))
 	row, err := con.Query("SELECT id FROM \"users\" WHERE nickname = ? AND hash = ?;", user.Nickname, fmt.Sprintf("%x", hash))
@@ -66,13 +70,21 @@ func (r *UserRepository) LoginUser(user entity.User) string {
 		return ""
 	}
 
-	defer row.Close()
-
 	bufSecret := make([]byte, 32)
 
 	rand.Read(bufSecret)
 
-	//todo: save sessions
+	session := entity.Session{
+		Hash: string(bufSecret),
+	}
+	row.Scan(&session.Id)
+
+	con.Close()
+	row.Close()
+
+	//save session
+	r.sessionRepo.AddSession(session)
+	//*save session
 
 	return string(bufSecret)
 }
