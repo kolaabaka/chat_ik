@@ -1,0 +1,1 @@
+![Structure diagram](./structure_diagram.png)
